@@ -54,6 +54,10 @@ class CloudstackVirtualMachine(resource.Resource):
         self.resource_id_set(vm.id)
         return vm.uuid
 
+    def check_create_complete(self, _compute_id):
+        # TODO
+        pass
+
     def handle_delete(self): 
         cs = self._get_cloustack()
 
@@ -61,6 +65,34 @@ class CloudstackVirtualMachine(resource.Resource):
             return
 
         cs.destroyVirtualMachine(self.resource_id)
+
+    def check_delete_complete(self, _compute_id):
+        # TODO
+        pass
+
+    def handle_suspend(self):
+        cs = self._get_cloustack()
+
+        if self.resource_id in None:
+            return
+
+        cs.stopVirtualMachine(self.resource_id)
+
+    def check_suspend_complete(self, _compute_id):
+        # TODO
+        pass
+
+    def handle_resume(self):
+        cs = self._get_cloustack()
+
+        if self.resource_id in None:
+            return
+
+        cs.startVirtualMachine(self.resource_id)
+
+    def check_resume_complete(self, _compute_id):
+        # TODO
+        pass
 
 def resource_mapping():
     mappings = {}
