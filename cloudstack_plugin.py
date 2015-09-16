@@ -65,6 +65,5 @@ class CloudstackVirtualMachine(resource.Resource):
 def resource_mapping():
     mappings = {}
 
-    mappings['Cloudstack::VirtualMachine'] = CloudstackVirtualMachine
+    mappings['Cloudstack::Compute::VirtualMachine'] = CloudstackVirtualMachine
 
-    return mappings
