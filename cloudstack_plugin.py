@@ -174,7 +174,7 @@ class CloudstackNetwork(resource.Resource):
     def handle_delete(self):
         cs = self._get_cloudstack()
 
-        if self.resource_id in None:
+        if self.resource_id is None:
             return
 
         cs.deleteNetwork(self.resource_id)
