@@ -1,0 +1,27 @@
+heat_template_version: 2013-05-23
+
+description: Heat template to deploy virtual machine in Cloudstack
+
+parameters:
+  service_offering_id:
+    type: string
+    default: 4d72d49b-9786-43ba-a19c-9f75302cadd0
+    description: Service offering ID
+
+  template_id:
+    type: string
+    default: de325e89-e129-4293-a507-5f606d64b6a1
+    description: Template ID
+
+  zone_id:
+    type: string
+    default: c864f104-624c-43d2-835e-b49a39709b6b
+    description: Zone ID
+
+resources:
+  MyCloudstackVMMachine:
+    type: Cloudstack::Compute::VirtualMachine
+    properties:
+      service_offering_id: { get_param: service_offering_id }
+      template_id: { get_param: template_id }
+      zone_id: { get_param: zone_id }
