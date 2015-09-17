@@ -4,6 +4,7 @@ from cs import CloudStack
 
 from heat.engine import properties
 from heat.engine import resource
+from gettext import gettext as _
 
 __author__ = 'cima'
 
@@ -31,6 +32,11 @@ class CloudstackVirtualMachine(resource.Resource):
             properties.Schema.STRING,
             _('Zone ID'),
             True
+        )
+        USER_DATA: properties.Schema(
+            properties.Schema.STRING,
+            _('User data'),
+            False
         )
     }
 
