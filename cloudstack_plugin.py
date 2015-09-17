@@ -1,11 +1,11 @@
-__author__ = 'cima'
-
 import uuid
 
 from cs import CloudStack
 
 from heat.engine import properties
 from heat.engine import resource
+
+__author__ = 'cima'
 
 API_ENDPOINT = ''
 API_KEY = ''
@@ -15,7 +15,7 @@ API_SECRET = ''
 class CloudstackVirtualMachine(resource.Resource):
     PROPERTIES = (SERVICE_OFFERING_ID, TEMPLATE_ID, ZONE_ID) = \
         ('service_offering_id', 'template_id', 'zone_id')
-    
+
     properties_schema = {
         SERVICE_OFFERING_ID: properties.Schema(
             properties.Schema.STRING,
@@ -36,8 +36,8 @@ class CloudstackVirtualMachine(resource.Resource):
 
     def _get_cloudstack(self):
         cs = CloudStack(endpoint=API_ENDPOINT,
-                key=API_KEY,
-                secret=API_SECRET) 
+                        key=API_KEY,
+                        secret=API_SECRET)
         return cs
 
     def handle_create(self):
@@ -58,7 +58,7 @@ class CloudstackVirtualMachine(resource.Resource):
         # TODO
         pass
 
-    def handle_delete(self): 
+    def handle_delete(self):
         cs = self._get_cloustack()
 
         if self.resource_id in None:
@@ -94,10 +94,11 @@ class CloudstackVirtualMachine(resource.Resource):
         # TODO
         pass
 
+
 class CloudstackNetwork(resource.Resource):
     PROPERTIES = (DISPLAY_TEXT, NAME, NETWORK_OFFERING_ID, ZONE_ID) = \
         ('display_text', 'name', 'network_offering_id', 'zone_id')
-    
+
     properties_schema = {
         DISPLAY_TEXT: properties.Schema(
             properties.Schema.STRING,
@@ -123,8 +124,8 @@ class CloudstackNetwork(resource.Resource):
 
     def _get_cloudstack(self):
         cs = CloudStack(endpoint=API_ENDPOINT,
-                key=API_KEY,
-                secret=API_SECRET) 
+                        key=API_KEY,
+                        secret=API_SECRET)
         return cs
 
     def handle_create(self):
@@ -134,11 +135,11 @@ class CloudstackNetwork(resource.Resource):
         name = self.properties.get(self.NAME)
         networkofferingid = self.properties.get(self.NETWORK_OFFERING_ID)
         zoneid = self.properties.get(self.ZONE_ID)
-    
+
         network = cs.createNetwork(displaytext=displaytext,
-                         name=name,
-                         networkofferingid=networkofferingid
-                         zoneid=zoneid)
+                                   name=name,
+                                   networkofferingid=networkofferingid
+                                   zoneid=zoneid)
 
         self.resource_id_set(network.id)
         return network.id
@@ -147,7 +148,7 @@ class CloudstackNetwork(resource.Resource):
         # TODO
         pass
 
-    def handle_delete(self): 
+    def handle_delete(self):
         cs = self._get_cloustack()
 
         if self.resource_id in None:
@@ -167,4 +168,3 @@ def resource_mapping():
     mappings['Cloudstack::Network::Network'] = CloudstackNetwork
 
     return mappings
-
