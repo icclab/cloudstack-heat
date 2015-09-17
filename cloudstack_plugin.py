@@ -88,11 +88,17 @@ class CloudstackVirtualMachine(resource.Resource):
         if self.resource_id is None:
             return
 
-        cs.stopVirtualMachine(self.resource_id)
+        cs.stopVirtualMachine(id=self.resource_id)
 
     def check_suspend_complete(self, _compute_id):
-        # TODO
-        pass
+        cs = self._get_cloudstack()
+
+        vm = cs.listVirtualMachines(id=self.resource_id)
+        if vm:
+            vm['virtualmachine'][0]['state'].lower() == 'stopped':
+                return True
+
+        return False
 
     def handle_resume(self):
         cs = self._get_cloudstack()
@@ -100,12 +106,17 @@ class CloudstackVirtualMachine(resource.Resource):
         if self.resource_id is None:
             return
 
-        cs.startVirtualMachine(self.resource_id)
+        cs.startVirtualMachine(id=self.resource_id)
 
     def check_resume_complete(self, _compute_id):
-        # TODO
-        pass
+        cs = self._get_cloudstack()
 
+        vm = cs.listVirtualMachines(id=self.resource_id)
+        if vm:
+            vm['virtualmachine'][0]['state'].lower() == 'running':
+                return True
+
+        return False
 '''
 class CloudstackNetwork(resource.Resource):
     PROPERTIES = (DISPLAY_TEXT, NAME, NETWORK_OFFERING_ID, ZONE_ID) = \
