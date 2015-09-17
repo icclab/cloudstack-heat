@@ -33,11 +33,6 @@ class CloudstackVirtualMachine(resource.Resource):
             _('Zone ID'),
             True
         )
-        USER_DATA: properties.Schema(
-            properties.Schema.STRING,
-            _('User data'),
-            False
-        )
     }
 
     def _get_cloudstack(self):
@@ -47,7 +42,7 @@ class CloudstackVirtualMachine(resource.Resource):
         return cs
 
     def handle_create(self):
-        cs = self._get_cloustack()
+        cs = self._get_cloudstack()
 
         serviceofferingid = self.properties.get(self.SERVICE_OFFERING_ID)
         templateid = self.properties.get(self.TEMPLATE_ID)
@@ -57,29 +52,40 @@ class CloudstackVirtualMachine(resource.Resource):
                                      templateid=templateid,
                                      zoneid=zoneid)
 
-        self.resource_id_set(vm.id)
-        return vm.id
+        self.resource_id_set(vm['id'])
+        return vm['id']
 
     def check_create_complete(self, _compute_id):
-        # TODO
-        pass
+        cs = self._get_cloudstack()
+
+        vm = cs.listVirtualMachines(id=self.resource_id)
+        if vm:
+            if vm['virtualmachine'][0]['state'].lower() == 'running':
+                return True
+
+        return False
 
     def handle_delete(self):
-        cs = self._get_cloustack()
+        cs = self._get_cloudstack()
 
-        if self.resource_id in None:
+        if self.resource_id is None:
             return
 
-        cs.destroyVirtualMachine(self.resource_id)
+        cs.destroyVirtualMachine(id=self.resource_id)
 
     def check_delete_complete(self, _compute_id):
-        # TODO
-        pass
+        cs = self._get_cloudstack()
+
+        vm = cs.listVirtualMachines(id=self.resource_id)
+        if vm:
+            return False
+
+        return True
 
     def handle_suspend(self):
-        cs = self._get_cloustack()
+        cs = self._get_cloudstack()
 
-        if self.resource_id in None:
+        if self.resource_id is None:
             return
 
         cs.stopVirtualMachine(self.resource_id)
@@ -89,9 +95,9 @@ class CloudstackVirtualMachine(resource.Resource):
         pass
 
     def handle_resume(self):
-        cs = self._get_cloustack()
+        cs = self._get_cloudstack()
 
-        if self.resource_id in None:
+        if self.resource_id is None:
             return
 
         cs.startVirtualMachine(self.resource_id)
@@ -100,7 +106,7 @@ class CloudstackVirtualMachine(resource.Resource):
         # TODO
         pass
 
-
+'''
 class CloudstackNetwork(resource.Resource):
     PROPERTIES = (DISPLAY_TEXT, NAME, NETWORK_OFFERING_ID, ZONE_ID) = \
         ('display_text', 'name', 'network_offering_id', 'zone_id')
@@ -155,7 +161,7 @@ class CloudstackNetwork(resource.Resource):
         pass
 
     def handle_delete(self):
-        cs = self._get_cloustack()
+        cs = self._get_cloudstack()
 
         if self.resource_id in None:
             return
@@ -165,12 +171,13 @@ class CloudstackNetwork(resource.Resource):
     def check_delete_complete(self, _compute_id):
         # TODO
         pass
+'''
 
 
 def resource_mapping():
     mappings = {}
 
     mappings['Cloudstack::Compute::VirtualMachine'] = CloudstackVirtualMachine
-    mappings['Cloudstack::Network::Network'] = CloudstackNetwork
+#    mappings['Cloudstack::Network::Network'] = CloudstackNetwork
 
     return mappings
