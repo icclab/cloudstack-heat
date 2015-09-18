@@ -5,6 +5,7 @@ from cs import CloudStack
 from heat.engine import properties
 from heat.engine import resource
 from gettext import gettext as _
+from base64 import b64encode
 
 __author__ = 'cima'
 
@@ -14,8 +15,8 @@ API_SECRET = ''
 
 
 class CloudstackVirtualMachine(resource.Resource):
-    PROPERTIES = (SERVICE_OFFERING_ID, TEMPLATE_ID, ZONE_ID) = \
-        ('service_offering_id', 'template_id', 'zone_id')
+    PROPERTIES = (SERVICE_OFFERING_ID, TEMPLATE_ID, ZONE_ID, USER_DATA) = \
+        ('service_offering_id', 'template_id', 'zone_id', 'user_data')
 
     properties_schema = {
         SERVICE_OFFERING_ID: properties.Schema(
@@ -32,6 +33,11 @@ class CloudstackVirtualMachine(resource.Resource):
             properties.Schema.STRING,
             _('Zone ID'),
             True
+        ),
+        USER_DATA: properties.Schema(
+            properties.Schema.STRING,
+            _('User data script'),
+            False
         )
     }
 
@@ -47,10 +53,12 @@ class CloudstackVirtualMachine(resource.Resource):
         serviceofferingid = self.properties.get(self.SERVICE_OFFERING_ID)
         templateid = self.properties.get(self.TEMPLATE_ID)
         zoneid = self.properties.get(self.ZONE_ID)
+        userdata = self.properties.get(self.USER_DATA)
 
         vm = cs.deployVirtualMachine(serviceofferingid=serviceofferingid,
                                      templateid=templateid,
-                                     zoneid=zoneid)
+                                     zoneid=zoneid,
+                                     userdata=b64encode(userdata))
 
         self.resource_id_set(vm['id'])
         return vm['id']
