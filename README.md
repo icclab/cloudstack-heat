@@ -23,5 +23,13 @@ Restart the heat engine service:
 service openstack-heat-engine restart
 ```
 
-Run ```heat resource-type-list```, verify that ```Cloudstack::Compute::CloudstackVirtualMachine``` shows up.
+Run ```heat resource-type-list``` and verify that Cloudstack resources show up.
 
+Supported Cloudstack resources:
+
+
+```
+Cloudstack::Compute::CloudstackVirtualMachine
+```
+
+Stay tuned! More Cloudstack resources will follow soon!
