@@ -5,23 +5,42 @@ description: Heat template to deploy virtual machine in Cloudstack
 parameters:
   service_offering_id:
     type: string
-    default: 4d72d49b-9786-43ba-a19c-9f75302cadd0
+    default: 7c12e6df-6096-43e6-b9e4-3cb7b4e3f4c8
     description: Service offering ID
 
   template_id:
     type: string
-    default: de325e89-e129-4293-a507-5f606d64b6a1
+    default: 34fa65ce-483b-4ffa-88f8-75f6ebf670c1
     description: Template ID
 
   zone_id:
     type: string
-    default: c864f104-624c-43d2-835e-b49a39709b6b
+    default: 1747ef5e-5451-41fd-9f1a-58913bae9702
     description: Zone ID
 
+  user_data:
+    type: string
+    default: ""
+    description: User data script 
+
+  key_pair:
+    type: string
+    default: cima
+    description: Name of the ssh key pair used to login to the VM
+
 resources:
-  MyCloudstackVMMachine:
+  MyCloudstackVM:
     type: Cloudstack::Compute::VirtualMachine
     properties:
       service_offering_id: { get_param: service_offering_id }
       template_id: { get_param: template_id }
       zone_id: { get_param: zone_id }
+      key_pair: { get_param: key_pair }
+      user_data:
+        str_replace:
+          template: |
+            #!/bin/sh
+            touch /tmp/test_file
+            echo %TEMPLATE_ID% > /tmp/test_file
+          params:
+            "%TEMPLATE_ID%": { get_param: template_id }
