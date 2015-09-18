@@ -29,29 +29,29 @@ class CloudstackVirtualMachine(resource.Resource):
 
     properties_schema = {
         SERVICE_OFFERING_ID: properties.Schema(
-            properties.Schema.STRING,
-            _('Service offering ID'),
-            True
+            data_type=properties.Schema.STRING,
+            description=_('Service offering ID'),
+            required=True
         ),
         TEMPLATE_ID: properties.Schema(
-            properties.Schema.STRING,
-            _('Template ID'),
-            True
+            data_type=properties.Schema.STRING,
+            description=_('Template ID'),
+            required=True
         ),
         ZONE_ID: properties.Schema(
-            properties.Schema.STRING,
-            _('Zone ID'),
-            True
+            data_type=properties.Schema.STRING,
+            description=_('Zone ID'),
+            required=True
         ),
         USER_DATA: properties.Schema(
-            properties.Schema.STRING,
-            _('User data script'),
-            False
+            data_type=properties.Schema.STRING,
+            description=_('User data script'),
+            required=False
         ),
         KEY_PAIR: properties.Schema(
-            properties.Schema.STRING,
-            _('Name of the ssh keypair to login to the VM'),
-            False
+            data_type=properties.Schema.STRING,
+            description=_('Name of the ssh keypair to login to the VM'),
+            required=False
         )
     }
 
