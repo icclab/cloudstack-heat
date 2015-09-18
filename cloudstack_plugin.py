@@ -15,8 +15,17 @@ API_SECRET = ''
 
 
 class CloudstackVirtualMachine(resource.Resource):
-    PROPERTIES = (SERVICE_OFFERING_ID, TEMPLATE_ID, ZONE_ID, USER_DATA, KEY_PAIR) = \
-        ('service_offering_id', 'template_id', 'zone_id', 'user_data', 'key_pair')
+    PROPERTIES = (
+        SERVICE_OFFERING_ID,
+        TEMPLATE_ID,
+        ZONE_ID,
+        USER_DATA,
+        KEY_PAIR) = (
+        'service_offering_id',
+        'template_id',
+        'zone_id',
+        'user_data',
+        'key_pair')
 
     properties_schema = {
         SERVICE_OFFERING_ID: properties.Schema(
