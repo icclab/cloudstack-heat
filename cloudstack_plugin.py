@@ -15,8 +15,8 @@ API_SECRET = ''
 
 
 class CloudstackVirtualMachine(resource.Resource):
-    PROPERTIES = (SERVICE_OFFERING_ID, TEMPLATE_ID, ZONE_ID, USER_DATA) = \
-        ('service_offering_id', 'template_id', 'zone_id', 'user_data')
+    PROPERTIES = (SERVICE_OFFERING_ID, TEMPLATE_ID, ZONE_ID, USER_DATA, KEY_PAIR) = \
+        ('service_offering_id', 'template_id', 'zone_id', 'user_data', 'key_pair')
 
     properties_schema = {
         SERVICE_OFFERING_ID: properties.Schema(
@@ -38,6 +38,11 @@ class CloudstackVirtualMachine(resource.Resource):
             properties.Schema.STRING,
             _('User data script'),
             False
+        ),
+        KEY_PAIR: properties.Schema(
+            properties.Schema.STRING,
+            _('Name of the ssh keypair to login to the VM'),
+            False
         )
     }
 
@@ -54,11 +59,13 @@ class CloudstackVirtualMachine(resource.Resource):
         templateid = self.properties.get(self.TEMPLATE_ID)
         zoneid = self.properties.get(self.ZONE_ID)
         userdata = self.properties.get(self.USER_DATA)
+        keypair = self.properties.get(self.KEY_PAIR)
 
         vm = cs.deployVirtualMachine(serviceofferingid=serviceofferingid,
                                      templateid=templateid,
                                      zoneid=zoneid,
-                                     userdata=b64encode(userdata))
+                                     userdata=b64encode(userdata),
+                                     keypair=keypair)
 
         self.resource_id_set(vm['id'])
         return vm['id']
@@ -103,7 +110,7 @@ class CloudstackVirtualMachine(resource.Resource):
 
         vm = cs.listVirtualMachines(id=self.resource_id)
         if vm:
-            vm['virtualmachine'][0]['state'].lower() == 'stopped':
+            if vm['virtualmachine'][0]['state'].lower() == 'stopped':
                 return True
 
         return False
@@ -121,7 +128,7 @@ class CloudstackVirtualMachine(resource.Resource):
 
         vm = cs.listVirtualMachines(id=self.resource_id)
         if vm:
-            vm['virtualmachine'][0]['state'].lower() == 'running':
+            if vm['virtualmachine'][0]['state'].lower() == 'running':
                 return True
 
         return False
