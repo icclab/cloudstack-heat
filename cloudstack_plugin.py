@@ -1,5 +1,3 @@
-import uuid
-
 from cs import CloudStack
 
 from heat.engine import properties
@@ -141,6 +139,19 @@ class CloudstackVirtualMachine(resource.Resource):
                 return True
 
         return False
+
+    def _resolve_attribute(self, name):
+        cs = self._get_cs()
+
+        vm = cs.listVirtualMachines(id=self.resource_id)
+        if vm:
+            if name == 'network_ip':
+                return vm['virtualmachine'][0]['nic'][0]['ipaddress']
+            return getattr(vm, name)
+
+    attributes_schema = {
+        'network_ip': _('ip address')
+    }
 
 
 def resource_mapping():

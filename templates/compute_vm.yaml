@@ -44,3 +44,8 @@ resources:
             echo %TEMPLATE_ID% > /tmp/test_file
           params:
             "%TEMPLATE_ID%": { get_param: template_id }
+
+outputs:
+  VM_IP:
+    description: IP address of the instance
+    value: { get_attr: [ MyCloudstackVM, network_ip ] }
