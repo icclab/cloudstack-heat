@@ -7,18 +7,20 @@ from base64 import b64encode
 
 __author__ = 'cima'
 
-API_ENDPOINT = ''
-API_KEY = ''
-API_SECRET = ''
-
 
 class CloudstackVirtualMachine(resource.Resource):
     PROPERTIES = (
+        API_ENDPOINT,
+        API_KEY,
+        API_SECRET,
         SERVICE_OFFERING_ID,
         TEMPLATE_ID,
         ZONE_ID,
         USER_DATA,
         KEY_PAIR) = (
+        'api_endpoint',
+        'api_key',
+        'api_secret',
         'service_offering_id',
         'template_id',
         'zone_id',
@@ -26,6 +28,21 @@ class CloudstackVirtualMachine(resource.Resource):
         'key_pair')
 
     properties_schema = {
+        API_ENDPOINT: properties.Schema(
+            data_type=properties.Schema.STRING,
+            description=_('Cloudstack API endpoint'),
+            required=True
+        ),
+        API_KEY: properties.Schema(
+            data_type=properties.Schema.STRING,
+            description=_('API key'),
+            required=True
+        ),
+        API_SECRET: properties.Schema(
+            data_type=properties.Schema.STRING,
+            description=_('API secret key'),
+            required=True
+        ),
         SERVICE_OFFERING_ID: properties.Schema(
             data_type=properties.Schema.STRING,
             description=_('Service offering ID'),
@@ -54,9 +71,9 @@ class CloudstackVirtualMachine(resource.Resource):
     }
 
     def _get_cloudstack(self):
-        cs = CloudStack(endpoint=API_ENDPOINT,
-                        key=API_KEY,
-                        secret=API_SECRET)
+        cs = CloudStack(endpoint=self.properties.get(self.API_ENDPOINT),
+                        key=self.properties.get(self.API_KEY),
+                        secret=self.properties.get(self.API_SECRET))
         return cs
 
     def handle_create(self):
@@ -141,7 +158,7 @@ class CloudstackVirtualMachine(resource.Resource):
         return False
 
     def _resolve_attribute(self, name):
-        cs = self._get_cs()
+        cs = self._get_cloudstack()
 
         vm = cs.listVirtualMachines(id=self.resource_id)
         if vm:

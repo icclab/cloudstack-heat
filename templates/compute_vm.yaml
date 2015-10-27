@@ -3,6 +3,18 @@ heat_template_version: 2013-05-23
 description: Heat template to deploy virtual machine in Cloudstack
 
 parameters:
+  api_endpoint:
+    type: string
+    description: Cloudstack API endpoint
+
+  api_key:
+    type: string
+    description: API key
+
+  api_secret:
+    type: string
+    description: API secret key
+
   service_offering_id:
     type: string
     default: 7c12e6df-6096-43e6-b9e4-3cb7b4e3f4c8
@@ -32,6 +44,9 @@ resources:
   MyCloudstackVM:
     type: Cloudstack::Compute::VirtualMachine
     properties:
+      api_endpoint: { get_param: api_endpoint }
+      api_key: { get_param: api_key }
+      api_secret: { get_param: api_secret }
       service_offering_id: { get_param: service_offering_id }
       template_id: { get_param: template_id }
       zone_id: { get_param: zone_id }
