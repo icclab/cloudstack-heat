@@ -60,6 +60,19 @@ resources:
           params:
             "%TEMPLATE_ID%": { get_param: template_id }
 
+  MySecurityGroup:
+    type: Cloudstack::Network::SecurityGroup
+    properties:
+      api_endpoint: { get_param: api_endpoint }
+      api_key: { get_param: api_key }
+      api_secret: { get_param: api_secret }
+      name: 'SecurityGroup1'
+      rules:
+        - direction: ingress
+          startport: 22
+          endport: 22
+          protocol: tcp
+          cidr: 0.0.0.0/0
 outputs:
   VM_IP:
     description: IP address of the instance
