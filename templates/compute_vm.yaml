@@ -51,6 +51,7 @@ resources:
       template_id: { get_param: template_id }
       zone_id: { get_param: zone_id }
       key_pair: { get_param: key_pair }
+      security_group_ids: [ { get_attr: [ MySecurityGroup, id ] } ]
       user_data:
         str_replace:
           template: |

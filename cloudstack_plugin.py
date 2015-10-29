@@ -18,7 +18,8 @@ class CloudstackVirtualMachine(resource.Resource):
         TEMPLATE_ID,
         ZONE_ID,
         USER_DATA,
-        KEY_PAIR) = (
+        KEY_PAIR,
+        SECURITY_GROUP_IDS) = (
         'api_endpoint',
         'api_key',
         'api_secret',
@@ -26,7 +27,8 @@ class CloudstackVirtualMachine(resource.Resource):
         'template_id',
         'zone_id',
         'user_data',
-        'key_pair')
+        'key_pair',
+        'security_group_ids')
 
     properties_schema = {
         API_ENDPOINT: properties.Schema(
@@ -68,6 +70,11 @@ class CloudstackVirtualMachine(resource.Resource):
             data_type=properties.Schema.STRING,
             description=_('Name of the ssh keypair to login to the VM'),
             required=False
+        ),
+        SECURITY_GROUP_IDS: properties.Schema(
+            data_type=properties.Schema.LIST,
+            description=_('List of security group ids'),
+            required=False
         )
     }
 
@@ -85,12 +92,23 @@ class CloudstackVirtualMachine(resource.Resource):
         zoneid = self.properties.get(self.ZONE_ID)
         userdata = self.properties.get(self.USER_DATA)
         keypair = self.properties.get(self.KEY_PAIR)
+        securitygroupids = self.properties.get(self.SECURITY_GROUP_IDS)
 
-        vm = cs.deployVirtualMachine(serviceofferingid=serviceofferingid,
-                                     templateid=templateid,
-                                     zoneid=zoneid,
-                                     userdata=b64encode(userdata),
-                                     keypair=keypair)
+        if securitygroupids:
+            vm = cs.deployVirtualMachine(
+                serviceofferingid=serviceofferingid,
+                templateid=templateid,
+                zoneid=zoneid,
+                userdata=b64encode(userdata),
+                keypair=keypair,
+                securitygroupids=securitygroupids)
+        else:
+            vm = cs.deployVirtualMachine(
+                serviceofferingid=serviceofferingid,
+                templateid=templateid,
+                zoneid=zoneid,
+                userdata=b64encode(userdata),
+                keypair=keypair)
 
         self.resource_id_set(vm['id'])
         return vm['id']
@@ -289,6 +307,19 @@ class CloudstackSecurityGroup(resource.Resource):
             return False
         else:
             return True
+
+    def _resolve_attribute(self, name):
+        cs = self._get_cloudstack()
+
+        sg = cs.listSecurityGroups(id=self.resource_id)
+        if sg:
+            if name == 'id':
+                return sg['securitygroup'][0]['id']
+            return getattr(sg, name)
+
+    attributes_schema = {
+        'id': _('id')
+    }
 
 
 def resource_mapping():
