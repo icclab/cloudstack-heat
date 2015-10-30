@@ -5,6 +5,7 @@ from heat.engine import properties
 from heat.engine import resource
 from gettext import gettext as _
 from base64 import b64encode
+from time import sleep
 
 __author__ = 'cima'
 
@@ -141,6 +142,7 @@ class CloudstackVirtualMachine(resource.Resource):
         except CloudStackException as e:
             if e.args[2]['errorcode'] == 431:
                 # Resource cannot be found
+                # One thing less...
                 return True
             print e
         if vm:
@@ -291,6 +293,12 @@ class CloudstackSecurityGroup(resource.Resource):
         try:
             cs.deleteSecurityGroup(id=self.resource_id)
         except CloudStackException as e:
+            if e.args[2]['errorcode'] == 536:
+                # Delete failed - cannot delete group when
+                # it's in use by virtual machines
+                # just wait for a while and try again
+                sleep(10)
+                self.handle_delete()
             print e
 
     def check_delete_complete(self, _compute_id):
@@ -301,6 +309,7 @@ class CloudstackSecurityGroup(resource.Resource):
         except CloudStackException as e:
             if e.args[2]['errorcode'] == 431:
                 # Resource cannot be found
+                # One thing less...
                 return True
             print e
         if sg:
