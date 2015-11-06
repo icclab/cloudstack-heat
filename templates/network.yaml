@@ -1,0 +1,97 @@
+heat_template_version: 2013-05-23
+
+description: Heat template to create a network and deploy virtual machine in Cloudstack
+
+parameters:
+  api_endpoint:
+    type: string
+    description: Cloudstack API endpoint
+
+  api_key:
+    type: string
+    description: API key
+    
+  api_secret:
+    type: string
+    description: API secret key
+
+  service_offering_id:
+    type: string
+    description: Service offering ID
+
+  template_id:
+    type: string
+    description: Template ID
+
+  zone_id:
+    type: string
+    description: Zone ID
+
+  user_data:
+    type: string
+    default: ""
+    description: User data script 
+
+  key_pair:
+    type: string
+    description: Name of the ssh key pair used to login to the VM
+  
+  net_name:
+    type: string
+    description: Network name
+
+  network_offering_id:
+    type: string
+    description: Network offering id
+
+  gateway:
+    type: string
+    description: Network gateway
+
+  netmask:
+    type: string
+    description: Network mask
+
+  vpc_id:
+    type: string
+    description: VPC id
+
+  acl_id:
+    type: string
+    description: ACL id
+
+resources:
+  MyCloudstackNetwork:
+    type: Cloudstack::Network::Network
+    properties: 
+      api_endpoint: { get_param: api_endpoint }
+      api_key: { get_param: api_key }
+      api_secret: { get_param: api_secret }
+      name: { get_param: net_name }
+      display_text: { get_param: net_name }
+      network_offering_id: { get_param: network_offering_id }
+      zone_id: { get_param: zone_id }
+      gateway: { get_param: gateway }
+      netmask: { get_param: netmask }
+      vpc_id: { get_param: vpc_id }
+      acl_id: { get_param: acl_id }
+
+  MyCloudstackVM:
+    type: Cloudstack::Compute::VirtualMachine
+    properties:
+      api_endpoint: { get_param: api_endpoint }
+      api_key: { get_param: api_key }
+      api_secret: { get_param: api_secret }
+      service_offering_id: { get_param: service_offering_id }
+      template_id: { get_param: template_id }
+      zone_id: { get_param: zone_id }
+      key_pair: { get_param: key_pair }
+      network_ids: [ { get_attr: [ MyCloudstackNetwork, id ] } ]
+      user_data:
+        str_replace:
+          template: |
+            #!/bin/sh
+            touch /tmp/test_file
+            echo %TEMPLATE_ID% > /tmp/test_file
+          params:
+            "%TEMPLATE_ID%": { get_param: template_id }
