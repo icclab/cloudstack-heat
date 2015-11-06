@@ -19,7 +19,8 @@ class CloudstackVirtualMachine(resource.Resource):
         ZONE_ID,
         USER_DATA,
         KEY_PAIR,
-        SECURITY_GROUP_IDS) = (
+        SECURITY_GROUP_IDS,
+        NETWORK_IDS) = (
         'api_endpoint',
         'api_key',
         'api_secret',
@@ -28,7 +29,8 @@ class CloudstackVirtualMachine(resource.Resource):
         'zone_id',
         'user_data',
         'key_pair',
-        'security_group_ids')
+        'security_group_ids',
+        'network_ids')
 
     properties_schema = {
         API_ENDPOINT: properties.Schema(
@@ -75,6 +77,11 @@ class CloudstackVirtualMachine(resource.Resource):
             data_type=properties.Schema.LIST,
             description=_('List of security group ids'),
             required=False
+        ),
+        NETWORK_IDS: properties.Schema(
+            data_type=properties.Schema.LIST,
+            description=_('List of network ids'),
+            required=False
         )
     }
 
@@ -93,8 +100,10 @@ class CloudstackVirtualMachine(resource.Resource):
         userdata = self.properties.get(self.USER_DATA)
         keypair = self.properties.get(self.KEY_PAIR)
         securitygroupids = self.properties.get(self.SECURITY_GROUP_IDS)
+        networkids = self.properties.get(self.NETWORK_IDS)
 
         if securitygroupids:
+            # base zone setup
             vm = cs.deployVirtualMachine(
                 serviceofferingid=serviceofferingid,
                 templateid=templateid,
@@ -102,7 +111,17 @@ class CloudstackVirtualMachine(resource.Resource):
                 userdata=b64encode(userdata),
                 keypair=keypair,
                 securitygroupids=securitygroupids)
+        elif networkids:
+            # advanced zone setup
+            vm = cs.deployVirtualMachine(
+                serviceofferingid=serviceofferingid,
+                templateid=templateid,
+                zoneid=zoneid,
+                userdata=b64encode(userdata),
+                keypair=keypair,
+                networkids=networkids)
         else:
+            # try default fallback
             vm = cs.deployVirtualMachine(
                 serviceofferingid=serviceofferingid,
                 templateid=templateid,
