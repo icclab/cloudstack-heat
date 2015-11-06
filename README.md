@@ -25,13 +25,20 @@ service openstack-heat-engine restart
 
 Run ```heat resource-type-list``` and verify that Cloudstack resources show up.
 
-Supported Cloudstack resources:
+## Supported Cloudstack resources:
 
 Basic zone:
 
 ```
 Cloudstack::Compute::VirtualMachine
-Cloudstack::Compute::SecurityGroup
+Cloudstack::Network::SecurityGroup
+```
+
+Advanced zone:
+
+```
+Cloudstack::Compute::VirtualMachine
+Cloudstack::Network::Network
 ```
 
 Stay tuned! More Cloudstack resources will follow soon!
