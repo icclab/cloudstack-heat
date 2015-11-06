@@ -126,8 +126,8 @@ class CloudstackNetwork(resource.Resource):
     def check_create_complete(self, _compute_id):
         cs = self._get_cloudstack()
 
-        sg = cs.listNetworks(id=self.resource_id)
-        if sg:
+        network = cs.listNetworks(id=self.resource_id)
+        if network:
             return True
 
         return False
