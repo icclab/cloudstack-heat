@@ -148,7 +148,8 @@ class CloudstackVirtualMachine(resource.Resource):
         if self.resource_id is None:
             return
         try:
-            cs.destroyVirtualMachine(id=self.resource_id)
+            cs.destroyVirtualMachine(id=self.resource_id,
+                                     expunge=True)
         except CloudStackException as e:
             print e
 
