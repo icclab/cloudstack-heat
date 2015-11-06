@@ -12,7 +12,7 @@ Copy the heat plugin to /usr/lib/heat:
 
 ```
 mkdir -p /usr/lib/heat
-cp cloustack_plugin.py /usr/lib/heat/cloudstack_plugin.py
+cp -r src/* /usr/lib/heat/
 ```
 
 Uncomment ```plugin_dirs``` line in ```/etc/heat/heat.conf```
