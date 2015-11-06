@@ -27,9 +27,11 @@ Run ```heat resource-type-list``` and verify that Cloudstack resources show up.
 
 Supported Cloudstack resources:
 
+Basic zone:
 
 ```
-Cloudstack::Compute::CloudstackVirtualMachine
+Cloudstack::Compute::VirtualMachine
+Cloudstack::Compute::SecurityGroup
 ```
 
 Stay tuned! More Cloudstack resources will follow soon!
