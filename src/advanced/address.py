@@ -109,9 +109,9 @@ class CloudstackAddress(resource.Resource):
         address = cs.listPublicIpAddresses(id=self.resource_id)
         if address:
             if name == 'id':
-                return address['publicipaddresses'][0]['id']
+                return address['publicipaddress'][0]['id']
             if name == 'ipaddress':
-                return address['publicipaddresses'][0]['ipaddress']
+                return address['publicipaddress'][0]['ipaddress']
             return getattr(address, name)
 
     attributes_schema = {
