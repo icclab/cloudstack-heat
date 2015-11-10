@@ -212,9 +212,12 @@ class CloudstackVirtualMachine(resource.Resource):
         if vm:
             if name == 'network_ip':
                 return vm['virtualmachine'][0]['nic'][0]['ipaddress']
+            if name == 'id':
+                return vm['virtualmachine'][0]['id']
             return getattr(vm, name)
 
     attributes_schema = {
+        'id': _('id'),
         'network_ip': _('ip address')
     }
 
