@@ -1,6 +1,6 @@
 heat_template_version: 2013-05-23
 
-description: Heat template to create a network and deploy virtual machine in Cloudstack
+description: Heat template to create a network and deploy virtual machine with floating IP in Cloudstack
 
 parameters:
   api_endpoint:
@@ -107,3 +107,12 @@ resources:
       vpc_id: { get_param: vpc_id }
       virtual_machine_id: { get_attr: [ MyCloudstackVM, id ] }
       network_id: { get_attr: [ MyCloudstackNetwork, id ] }
+
+outputs:
+  ipaddress:
+    description: IP address
+    value: { get_attr: [ MyFloatingIP, ipaddress ] }
+
+  vmid:
+    description: VM id
+    value: { get_attr: [ MyCloudstackVM, id ] }
