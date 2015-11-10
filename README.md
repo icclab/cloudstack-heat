@@ -40,6 +40,7 @@ Advanced zone:
 Cloudstack::Compute::VirtualMachine
 Cloudstack::Network::Network
 Cloudstack::Network::VPC
+Cloudstack::Network::Address
 ```
 
 Stay tuned! More Cloudstack resources will follow soon!
