@@ -10,7 +10,7 @@ parameters:
   api_key:
     type: string
     description: API key
-    
+
   api_secret:
     type: string
     description: API secret key
@@ -30,37 +30,33 @@ parameters:
   user_data:
     type: string
     default: ""
-    description: User data script 
+    description: User data script
 
   key_pair:
     type: string
     description: Name of the ssh key pair used to login to the VM
-  
+
   net_name:
     type: string
-    description: Network name
+    default: 'my-net'
 
   network_offering_id:
     type: string
-    description: Network offering ID
 
   gateway:
     type: string
-    description: Network gateway
-    default: 10.0.0.1
+    default: 10.0.3.1
 
   netmask:
     type: string
-    description: Network netmask
     default: 255.255.255.0
 
   vpc_id:
     type: string
-    description: VPC ID
 
   acl_id:
     type: string
-    description: ACL to be used for the network
+
 
 resources:
   MyCloudstackNetwork:
@@ -105,6 +101,14 @@ resources:
       api_key: { get_param: api_key }
       api_secret: { get_param: api_secret }
       vpc_id: { get_param: vpc_id }
+
+  MyNAT:
+    type: Cloudstack::Network::StaticNAT
+    properties:
+      api_endpoint: { get_param: api_endpoint }
+      api_key: { get_param: api_key }
+      api_secret: { get_param: api_secret }
+      ip_address_id: { get_attr: [ MyFloatingIP, id ] }
       virtual_machine_id: { get_attr: [ MyCloudstackVM, id ] }
       network_id: { get_attr: [ MyCloudstackNetwork, id ] }
 

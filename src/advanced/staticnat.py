@@ -7,16 +7,20 @@ from gettext import gettext as _
 __author__ = 'cima'
 
 
-class CloudstackAddress(resource.Resource):
+class CloudstackStaticNAT(resource.Resource):
     PROPERTIES = (
         API_ENDPOINT,
         API_KEY,
         API_SECRET,
-        VPC_ID) = (
+        IP_ADDRESS_ID,
+        VIRTUAL_MACHINE_ID,
+        NETWORK_ID) = (
         'api_endpoint',
         'api_key',
         'api_secret',
-        'vpc_id')
+        'ip_address_id',
+        'virtual_machine_id',
+        'network_id')
 
     properties_schema = {
         API_ENDPOINT: properties.Schema(
@@ -34,10 +38,20 @@ class CloudstackAddress(resource.Resource):
             description=_('API secret key'),
             required=True
         ),
-        VPC_ID: properties.Schema(
+        IP_ADDRESS_ID: properties.Schema(
             data_type=properties.Schema.STRING,
-            description=_('VPC ID'),
+            description=_('IP address ID'),
             required=True
+        ),
+        VIRTUAL_MACHINE_ID: properties.Schema(
+            data_type=properties.Schema.STRING,
+            description=_('VM ID'),
+            required=True
+        ),
+        NETWORK_ID: properties.Schema(
+            data_type=properties.Schema.STRING,
+            description=_('Network ID'),
+            required=False
         )
     }
 
@@ -50,47 +64,34 @@ class CloudstackAddress(resource.Resource):
     def handle_create(self):
         cs = self._get_cloudstack()
 
-        vpcid = self.properties.get(self.VPC_ID)
+        virtualmachineid = self.properties.get(self.VIRTUAL_MACHINE_ID)
+        ipaddressid = self.properties.get(self.IP_ADDRESS_ID)
+        networkid = self.properties.get(self.NETWORK_ID)
 
-        address = cs.associateIpAddress(vpcid=vpcid)
+        cs.enableStaticNat(
+            ipaddressid=ipaddressid,
+            virtualmachineid=virtualmachineid,
+            networkid=networkid)
 
-        self.resource_id_set(address['id'])
-        return address['id']
+        return ipaddressid
 
     def check_create_complete(self, _compute_id):
         # TODO: Add more sofisticated condition
         return True
 
     def handle_delete(self):
-        cs = self._get_cloudstack()
-
-        if self.resource_id is None:
-            return
-
-        cs.disassociateIpAddress(id=self.resource_id)
+        # Nothing to do here as NAT resource does not have id
+        pass
 
     def check_delete_complete(self, _compute_id):
         # TODO: Add more sofisticated condition
         return True
 
     def _resolve_attribute(self, name):
-        cs = self._get_cloudstack()
-
-        address = cs.listPublicIpAddresses(id=self.resource_id)
-        if address:
-            if name == 'id':
-                return address['publicipaddress'][0]['id']
-            if name == 'ipaddress':
-                return address['publicipaddress'][0]['ipaddress']
-            return getattr(address, name)
-
-    attributes_schema = {
-        'id': _('id'),
-        'ipaddress': _('ipaddress')
-    }
+        pass
 
 
 def resource_mapping():
     mappings = {}
-    mappings['Cloudstack::Network::Address'] = CloudstackAddress
+    mappings['Cloudstack::Network::StaticNAT'] = CloudstackStaticNAT
     return mappings
