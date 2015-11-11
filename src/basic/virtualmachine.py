@@ -218,7 +218,7 @@ class CloudstackVirtualMachine(resource.Resource):
 
     attributes_schema = {
         'id': _('id'),
-        'network_ip': _('ip address')
+        'network_ip': _('network_ip')
     }
 
 
