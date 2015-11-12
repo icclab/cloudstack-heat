@@ -92,14 +92,16 @@ class CloudstackVirtualMachine(resource.Resource):
         )
     }
 
-    def _get_cloudstack(self):
+    def _get_cloudstack(self, method='get'):
         cs = CloudStack(endpoint=self.properties.get(self.API_ENDPOINT),
                         key=self.properties.get(self.API_KEY),
-                        secret=self.properties.get(self.API_SECRET))
+                        secret=self.properties.get(self.API_SECRET),
+                        method=method)
         return cs
 
     def handle_create(self):
-        cs = self._get_cloudstack()
+        # use post to be able to inject up to 64k user data
+        cs = self._get_cloudstack(method='post')
 
         serviceofferingid = self.properties.get(self.SERVICE_OFFERING_ID)
         templateid = self.properties.get(self.TEMPLATE_ID)
