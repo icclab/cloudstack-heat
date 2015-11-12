@@ -14,6 +14,7 @@ class CloudstackVirtualMachine(resource.Resource):
         API_ENDPOINT,
         API_KEY,
         API_SECRET,
+        NAME,
         SERVICE_OFFERING_ID,
         TEMPLATE_ID,
         ZONE_ID,
@@ -24,6 +25,7 @@ class CloudstackVirtualMachine(resource.Resource):
         'api_endpoint',
         'api_key',
         'api_secret',
+        'name',
         'service_offering_id',
         'template_id',
         'zone_id',
@@ -47,6 +49,11 @@ class CloudstackVirtualMachine(resource.Resource):
             data_type=properties.Schema.STRING,
             description=_('API secret key'),
             required=True
+        ),
+        NAME: properties.Schema(
+            data_type=properties.Schema.STRING,
+            description=_('Virtual machine hostname'),
+            required=False
         ),
         SERVICE_OFFERING_ID: properties.Schema(
             data_type=properties.Schema.STRING,
@@ -101,10 +108,12 @@ class CloudstackVirtualMachine(resource.Resource):
         keypair = self.properties.get(self.KEY_PAIR)
         securitygroupids = self.properties.get(self.SECURITY_GROUP_IDS)
         networkids = self.properties.get(self.NETWORK_IDS)
+        name = self.properties.get(self.NAME)
 
         if securitygroupids:
             # base zone setup
             vm = cs.deployVirtualMachine(
+                name=name,
                 serviceofferingid=serviceofferingid,
                 templateid=templateid,
                 zoneid=zoneid,
@@ -114,6 +123,7 @@ class CloudstackVirtualMachine(resource.Resource):
         elif networkids:
             # advanced zone setup
             vm = cs.deployVirtualMachine(
+                name=name,
                 serviceofferingid=serviceofferingid,
                 templateid=templateid,
                 zoneid=zoneid,
@@ -123,6 +133,7 @@ class CloudstackVirtualMachine(resource.Resource):
         else:
             # try default fallback
             vm = cs.deployVirtualMachine(
+                name=name,
                 serviceofferingid=serviceofferingid,
                 templateid=templateid,
                 zoneid=zoneid,

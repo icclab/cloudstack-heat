@@ -77,6 +77,7 @@ resources:
   MyCloudstackVM:
     type: Cloudstack::Compute::VirtualMachine
     properties:
+      name: my_test_vm
       api_endpoint: { get_param: api_endpoint }
       api_key: { get_param: api_key }
       api_secret: { get_param: api_secret }
