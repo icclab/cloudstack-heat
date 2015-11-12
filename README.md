@@ -1,4 +1,7 @@
 # OpenStack HEAT for Cloudstack
+
+This OpenStack HEAT plugin adds support for CloudStack cloud resources - CloudStack orchestration using OpenStack HEAT!
+
 Uses Exoscale's simple, yet powerful CloudStack API client for python and the command-line. (https://github.com/exoscale/cs)
 
 ## Install cs library & Heat plugin
