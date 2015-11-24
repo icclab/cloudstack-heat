@@ -21,7 +21,8 @@ class CloudstackVirtualMachine(resource.Resource):
         USER_DATA,
         KEY_PAIR,
         SECURITY_GROUP_IDS,
-        NETWORK_IDS) = (
+        NETWORK_IDS,
+        IPADDRESS) = (
         'api_endpoint',
         'api_key',
         'api_secret',
@@ -32,7 +33,8 @@ class CloudstackVirtualMachine(resource.Resource):
         'user_data',
         'key_pair',
         'security_group_ids',
-        'network_ids')
+        'network_ids',
+        'ipaddress')
 
     properties_schema = {
         API_ENDPOINT: properties.Schema(
@@ -89,6 +91,11 @@ class CloudstackVirtualMachine(resource.Resource):
             data_type=properties.Schema.LIST,
             description=_('List of network ids'),
             required=False
+        ),
+        IPADDRESS: properties.Schema(
+            data_type=properties.Schema.STRING,
+            description=_('VM IP address'),
+            required=False
         )
     }
 
@@ -119,6 +126,8 @@ class CloudstackVirtualMachine(resource.Resource):
             params['networkids'] = self.properties.get(self.NETWORK_IDS)
         if self.properties.get(self.NAME):
             params['name'] = self.properties.get(self.NAME)
+        if self.properties.get(self.IPADDRESS):
+            params['ipaddress'] = self.properties.get(self.IPADDRESS)
 
         vm = cs.deployVirtualMachine(**params)
 
