@@ -112,7 +112,8 @@ class CloudstackVirtualMachine(resource.Resource):
 
         params = {}
 
-        params['serviceofferingid'] = self.properties.get(self.SERVICE_OFFERING_ID)
+        params['serviceofferingid'] = self.properties.get(
+            self.SERVICE_OFFERING_ID)
         params['templateid'] = self.properties.get(self.TEMPLATE_ID)
         params['zoneid'] = self.properties.get(self.ZONE_ID)
 
@@ -121,7 +122,8 @@ class CloudstackVirtualMachine(resource.Resource):
         if self.properties.get(self.KEY_PAIR):
             params['keypair'] = self.properties.get(self.KEY_PAIR)
         if self.properties.get(self.SECURITY_GROUP_IDS):
-            params['securitygroupids'] = self.properties.get(self.SECURITY_GROUP_IDS)
+            params['securitygroupids'] = self.properties.get(
+                self.SECURITY_GROUP_IDS)
         if self.properties.get(self.NETWORK_IDS):
             params['networkids'] = self.properties.get(self.NETWORK_IDS)
         if self.properties.get(self.NAME):
