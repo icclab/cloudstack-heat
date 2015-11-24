@@ -103,44 +103,24 @@ class CloudstackVirtualMachine(resource.Resource):
         # use post to be able to inject up to 64k user data
         cs = self._get_cloudstack(method='post')
 
-        serviceofferingid = self.properties.get(self.SERVICE_OFFERING_ID)
-        templateid = self.properties.get(self.TEMPLATE_ID)
-        zoneid = self.properties.get(self.ZONE_ID)
-        userdata = self.properties.get(self.USER_DATA)
-        keypair = self.properties.get(self.KEY_PAIR)
-        securitygroupids = self.properties.get(self.SECURITY_GROUP_IDS)
-        networkids = self.properties.get(self.NETWORK_IDS)
-        name = self.properties.get(self.NAME)
+        params = {}
 
-        if securitygroupids:
-            # base zone setup
-            vm = cs.deployVirtualMachine(
-                name=name,
-                serviceofferingid=serviceofferingid,
-                templateid=templateid,
-                zoneid=zoneid,
-                userdata=b64encode(userdata),
-                keypair=keypair,
-                securitygroupids=securitygroupids)
-        elif networkids:
-            # advanced zone setup
-            vm = cs.deployVirtualMachine(
-                name=name,
-                serviceofferingid=serviceofferingid,
-                templateid=templateid,
-                zoneid=zoneid,
-                userdata=b64encode(userdata),
-                keypair=keypair,
-                networkids=networkids)
-        else:
-            # try default fallback
-            vm = cs.deployVirtualMachine(
-                name=name,
-                serviceofferingid=serviceofferingid,
-                templateid=templateid,
-                zoneid=zoneid,
-                userdata=b64encode(userdata),
-                keypair=keypair)
+        params['serviceofferingid'] = self.properties.get(self.SERVICE_OFFERING_ID)
+        params['templateid'] = self.properties.get(self.TEMPLATE_ID)
+        params['zoneid'] = self.properties.get(self.ZONE_ID)
+
+        if self.properties.get(self.USER_DATA):
+            params['userdata'] = b64encode(self.properties.get(self.USER_DATA))
+        if self.properties.get(self.KEY_PAIR):
+            params['keypair'] = self.properties.get(self.KEY_PAIR)
+        if self.properties.get(self.SECURITY_GROUP_IDS):
+            params['securitygroupids'] = self.properties.get(self.SECURITY_GROUP_IDS)
+        if self.properties.get(self.NETWORK_IDS):
+            params['networkids'] = self.properties.get(self.NETWORK_IDS)
+        if self.properties.get(self.NAME):
+            params['name'] = self.properties.get(self.NAME)
+
+        vm = cs.deployVirtualMachine(**params)
 
         self.resource_id_set(vm['id'])
         return vm['id']
