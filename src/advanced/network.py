@@ -132,6 +132,14 @@ class CloudstackNetwork(resource.Resource):
 
         return False
 
+    def handle_update(self, json_snippet=None, tmpl_diff=None, prop_diff=None):
+        # TODO
+        pass
+
+    def check_update_complete(self):
+        # TODO
+        pass
+
     def handle_delete(self):
         cs = self._get_cloudstack()
 
@@ -140,7 +148,7 @@ class CloudstackNetwork(resource.Resource):
         try:
             cs.deleteNetwork(id=self.resource_id)
         except CloudStackException as e:
-            print e
+            raise e
 
     def check_delete_complete(self, _compute_id):
         cs = self._get_cloudstack()
@@ -152,7 +160,7 @@ class CloudstackNetwork(resource.Resource):
                 # Resource cannot be found
                 # One thing less...
                 return True
-            print e
+            raise e
         if network:
             return False
         else:

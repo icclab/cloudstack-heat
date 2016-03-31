@@ -61,6 +61,14 @@ class CloudstackAddress(resource.Resource):
         # TODO: Add more sofisticated condition
         return True
 
+    def handle_update(self, json_snippet=None, tmpl_diff=None, prop_diff=None):
+        # TODO
+        pass
+
+    def check_update_complete(self):
+        # TODO
+        pass
+
     def handle_delete(self):
         cs = self._get_cloudstack()
 
