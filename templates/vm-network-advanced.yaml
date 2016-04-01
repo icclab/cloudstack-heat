@@ -1,0 +1,103 @@
+heat_template_version: 2013-05-23
+
+description: 'This template deploys network and VM with an assigned floating IP in existing VPC. This requires CloudStack deployment with advanced zone setup.'
+
+parameters:
+  api_endpoint:
+    type: string
+    description: Cloudstack API endpoint
+
+  api_key:
+    type: string
+    description: API key
+
+  api_secret:
+    type: string
+    description: API secret key
+
+  service_offering_id:
+    type: string
+    description: CloudStack service offering ID
+    default: 2b7cadf0-8a7a-4969-a009-9e7a1ad088a4
+
+  template_id:
+    type: string
+    description: CloudStack template ID
+    default: 165304e3-e75e-428d-8652-00a120cbb90c
+
+  zone_id:
+    type: string
+    description: CloudStack zone ID
+    default: 9e165259-d754-4704-9813-f235c4f613f7
+
+  network_offering_id:
+    type: string
+    description: CloudStack network offering ID
+    default: 5465ab42-a551-4ec3-b994-ebb3cc6321cc
+
+  gateway:
+    type: string
+    description: Network gateway
+    default: 10.0.0.1
+
+  netmask:
+    type: string
+    description: Network netmask
+    default: 255.255.255.0
+
+  vpc_id:
+    type: string
+    description: CloudStack VPC ID
+    default: 6749b3e0-9c39-4185-adfa-8ba6396b6e51
+
+  acl_id:
+    type: string
+    description: ACL to be used for the network
+    default: ab06abac-0719-11e5-ba7e-5254009abd48
+
+resources:
+  my_network:
+    type: Cloudstack::Network::Network
+    properties: 
+      api_endpoint: { get_param: api_endpoint }
+      api_key: { get_param: api_key }
+      api_secret: { get_param: api_secret }
+      name: my-network
+      display_text: my_network
+      network_offering_id: { get_param: network_offering_id }
+      zone_id: { get_param: zone_id }
+      gateway: { get_param: gateway }
+      netmask: { get_param: netmask }
+      vpc_id: { get_param: vpc_id }
+      acl_id: { get_param: acl_id }
+
+  my_vm:
+    type: Cloudstack::Compute::VirtualMachine
+    properties:
+      api_endpoint: { get_param: api_endpoint }
+      api_key: { get_param: api_key }
+      api_secret: { get_param: api_secret }
+      name: my-vm
+      template_id: { get_param: template_id }
+      service_offering_id: { get_param: service_offering_id }
+      network_ids: [ { get_attr: [ my_network, id ] } ]
+      zone_id: { get_param: zone_id }
+      user_data: ''
+
+  my_floating_ip:
+    type: Cloudstack::Network::Address
+    properties:
+      api_endpoint: { get_param: api_endpoint }
+      api_key: { get_param: api_key }
+      api_secret: { get_param: api_secret }
+      vpc_id: { get_param: vpc_id }
+
+  my_nat:
+    type: Cloudstack::Network::StaticNAT
+    properties:
+      api_endpoint: { get_param: api_endpoint }
+      api_key: { get_param: api_key }
+      api_secret: { get_param: api_secret }
+      ip_address_id: { get_attr: [ my_floating_ip, id ] }
+      virtual_machine_id: { get_attr: [ my_vm, id ] }
+      network_id: { get_attr: [ my_network, id ] }
