@@ -5,6 +5,11 @@ from heat.engine import properties
 from heat.engine import resource
 from gettext import gettext as _
 from base64 import b64encode
+from fabric.api import settings
+from fabric.api import run
+from oslo_log import log as logging
+
+logger = logging.getLogger(__name__)
 
 __author__ = 'cima'
 
@@ -22,7 +27,9 @@ class CloudstackVirtualMachine(resource.Resource):
         KEY_PAIR,
         SECURITY_GROUP_IDS,
         NETWORK_IDS,
-        IPADDRESS) = (
+        IPADDRESS,
+        SSH_USER,
+        SSH_PRIVATE_KEY_PATH) = (
         'api_endpoint',
         'api_key',
         'api_secret',
@@ -34,7 +41,9 @@ class CloudstackVirtualMachine(resource.Resource):
         'key_pair',
         'security_group_ids',
         'network_ids',
-        'ipaddress')
+        'ipaddress',
+        'ssh_user',
+        'ssh_private_key_path')
 
     properties_schema = {
         API_ENDPOINT: properties.Schema(
@@ -75,7 +84,8 @@ class CloudstackVirtualMachine(resource.Resource):
         USER_DATA: properties.Schema(
             data_type=properties.Schema.STRING,
             description=_('User data script'),
-            required=False
+            required=False,
+            update_allowed=True
         ),
         KEY_PAIR: properties.Schema(
             data_type=properties.Schema.STRING,
@@ -95,6 +105,17 @@ class CloudstackVirtualMachine(resource.Resource):
         IPADDRESS: properties.Schema(
             data_type=properties.Schema.STRING,
             description=_('VM IP address'),
+            required=False
+
+        ),
+        SSH_USER: properties.Schema(
+            data_type=properties.Schema.STRING,
+            description=_('SSH user used by Fabric plugin'),
+            required=False
+        ),
+        SSH_PRIVATE_KEY_PATH: properties.Schema(
+            data_type=properties.Schema.STRING,
+            description=_('Private SSH key used by Fabric plugin'),
             required=False
         )
     }
@@ -146,13 +167,22 @@ class CloudstackVirtualMachine(resource.Resource):
 
         return False
 
-    def handle_update(self, json_snippet=None, tmpl_diff=None, prop_diff=None):
-        # TODO
-        pass
+    def handle_update(self, json_snippet, tmpl_diff, prop_diff):
+        logger.debug(_("Update server %s") % self.resource_id)
+        logger.debug("json_snippet: %s" % json_snippet)
+        logger.debug("tmpl_diff: %s" % tmpl_diff)
+        logger.debug("prop_diff: %s" % prop_diff)
+
+        if 'user_data' in prop_diff:
+            with settings(host_string=self._resolve_attribute('public_ip'),
+                          user=self.properties.get(self.SSH_USER),
+                          key_filename=self.properties.get(
+                            self.SSH_PRIVATE_KEY_PATH)):
+                run(str(prop_diff['user_data']))
 
     def check_update_complete(self):
         # TODO
-        pass
+        return True
 
     def handle_delete(self):
         cs = self._get_cloudstack()
@@ -226,11 +256,14 @@ class CloudstackVirtualMachine(resource.Resource):
                 return vm['virtualmachine'][0]['nic'][0]['ipaddress']
             if name == 'id':
                 return vm['virtualmachine'][0]['id']
+            if name == 'public_ip':
+                return vm['virtualmachine'][0]['publicip']
             return getattr(vm, name)
 
     attributes_schema = {
         'id': _('id'),
-        'network_ip': _('network_ip')
+        'network_ip': _('network_ip'),
+        'public_ip': _('public_ip')
     }
 
 
