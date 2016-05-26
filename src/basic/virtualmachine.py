@@ -184,14 +184,19 @@ class CloudstackVirtualMachine(resource.Resource):
         # TODO
         return True
 
-    def handle_delete(self):
+    def handle_delete(self, expunge=True):
         cs = self._get_cloudstack()
 
         if self.resource_id is None:
             return
         try:
-            cs.destroyVirtualMachine(id=self.resource_id,
-                                     expunge=True)
+            res = cs.destroyVirtualMachine(id=self.resource_id,
+                                           expunge=expunge)
+            jobid = res['jobid']
+            res = cs.queryAsyncJobResult(jobid=jobid)
+            if int(res['jobresultcode']) == 530:
+                # try to delete with expunge = False
+                self.handle_delete(expunge=False)
         except CloudStackException as e:
             raise e
 
